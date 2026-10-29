@@ -1,7 +1,15 @@
 import { useState } from 'react'
 import { createNooChan, NooChan, NooChanDialog } from '../src'
+import { existingRuntimeOf } from '../src/react/controller'
 
 const nooChan = createNooChan()
+
+/** Actions nothing else on the page sets off; the buttons play them at once. */
+const actions = [
+  { label: '打哈欠', step: 'yawn.yawn' },
+  { label: '摇一摇', step: 'sway.sway' },
+  { label: '睡觉', step: 'sleep.sleep' },
+]
 
 /** Stand-in notices for the dialog's screen. */
 const notices = [
@@ -23,9 +31,7 @@ export function App() {
     <main style={{ maxWidth: 720, margin: '0 auto', padding: '32px 16px', lineHeight: 1.6 }}>
       <h1 style={{ fontSize: 22, margin: '0 0 8px' }}>no-chan playground</h1>
       <p style={{ margin: '0 0 24px', color: '#555' }}>
-        按住她拖动，松手她会落下来。勾上「有通知」她会掏出手机，这时点她算一次点击，并打开她的手机面板；点
-        home 条、按 Esc
-        或点手机外面关上。站在离墙一个身宽以内、三分钟不动鼠标键盘，她会靠墙睡着。取消「显示」再勾上，她会回到上次站的地方。
+        拖她，松手会落下。有通知时她看手机，点她打开手机面板。睡着后动鼠标叫醒她。
       </p>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
         <label>
@@ -62,6 +68,13 @@ export function App() {
           />{' '}
           {unit} ms
         </label>
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 12 }}>
+        {actions.map((action) => (
+          <button key={action.step} onClick={() => existingRuntimeOf(nooChan)?.play(action.step)}>
+            {action.label}
+          </button>
+        ))}
       </div>
       <p style={{ marginTop: 24, fontFamily: 'ui-monospace, monospace', fontSize: 14 }}>
         点击：{clicks} 次

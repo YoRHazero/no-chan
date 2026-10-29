@@ -275,6 +275,16 @@ export class Runtime {
     }
   }
 
+  /**
+   * For the playground: switches her to `step` (`frameset.action` or
+   * `frameset.action.step`) at once, past every command and priority.
+   */
+  play(step: string) {
+    if (this.host) {
+      this.go(this.character.ref(step), 0)
+    }
+  }
+
   view(): View {
     return {
       url: this.character.frameOf(this.step).url,

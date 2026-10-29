@@ -33,6 +33,11 @@ export function createNooChan(): NooChanController {
   return controller
 }
 
+/** For the playground: the controller's runtime, or null until she has first appeared. */
+export function existingRuntimeOf(controller: NooChanController): Runtime | null {
+  return hubs.get(controller)?.runtime ?? null
+}
+
 /** For NooChan: the controller's runtime, made by `create` the first time. */
 export function runtimeOf(controller: NooChanController, create: () => Runtime): Runtime {
   const hub = hubs.get(controller)
