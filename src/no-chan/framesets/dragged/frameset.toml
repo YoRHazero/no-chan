@@ -1,0 +1,12 @@
+# Held up by her raised right hand, her hair and skirt swinging. The anchor is
+# the hand, so it stays under the cursor from frame to frame.
+scale = 0.5
+anchor = [20, 10]
+between_feet = [53, 212] # her feet as they hang in frame 0
+
+[actions.held]
+priority = 2
+duration = 2
+motion = "follow"
+next = "dragged.held"
+steps = [{ frame = "0" }, { frame = "1" }, { frame = "2" }, { frame = "3" }]

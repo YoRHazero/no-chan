@@ -1,0 +1,14 @@
+# Landed: she sits a moment where she fell, then gets up.
+scale = 0.5
+anchor = [64, 202]
+
+[actions.land]
+priority = 1
+steps = [
+  { frame = "0", duration = 4.5 },
+  { frame = "1", duration = 1.5 },
+  { frame = "2", duration = 1.5 },
+  { frame = "3", duration = 1.5 },
+  { frame = "4", duration = 1.5 },
+  { frame = "5", duration = 1.2 },
+]

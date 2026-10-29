@@ -1,0 +1,20 @@
+# Swaying to her music. Frame 1 is upright with her hands on the headphones,
+# 2 leans left, 3 leans right: she sways twice each way.
+scale = 0.5
+anchor = [84, 207]
+
+[actions.sway]
+steps = [
+  { frame = "0", duration = 0.8 },
+  { frame = "1", duration = 3 },
+  { frame = "2", duration = 3.5 },
+  { frame = "1", duration = 3 },
+  { frame = "3", duration = 3.5 },
+  { frame = "1", duration = 3 },
+  { frame = "2", duration = 3.5 },
+  { frame = "1", duration = 3 },
+  { frame = "3", duration = 3.5 },
+  { frame = "1", duration = 2.5 },
+  { frame = "4", duration = 3 },
+  { frame = "5", duration = 1.2 },
+]

@@ -1,0 +1,6 @@
+# The standard standing pose: where every action goes when it names no next.
+scale = 0.5
+anchor = [60, 202]
+
+[actions.standing]
+steps = [{ frame = "0" }]

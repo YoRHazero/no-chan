@@ -1,0 +1,19 @@
+# Something went wrong: she frowns, scratches her head (frames 2 and 3, back
+# and forth), then smiles awkwardly.
+scale = 0.5
+anchor = [65, 205]
+
+[actions.troubled]
+priority = 1
+steps = [
+  { frame = "0", duration = 0.8 },
+  { frame = "1", duration = 4 },
+  { frame = "2", duration = 1.8 },
+  { frame = "3", duration = 1.8 },
+  { frame = "2", duration = 1.8 },
+  { frame = "3", duration = 1.8 },
+  { frame = "2", duration = 1.8 },
+  { frame = "3", duration = 2.5 },
+  { frame = "4", duration = 4.5 },
+  { frame = "5", duration = 1.2 },
+]

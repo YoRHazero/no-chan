@@ -1,0 +1,16 @@
+# Hit on the head by a paper ball: she holds her head, looks down at the ball,
+# picks it up (frame 3), looks at it and puts it in her pocket.
+scale = 0.5
+anchor = [75, 203]
+
+[actions.request]
+priority = 1
+steps = [
+  { frame = "0", duration = 2.5 },
+  { frame = "1", duration = 5.5 },
+  { frame = "2", duration = 5 },
+  { frame = "3", duration = 4 },
+  { frame = "4", duration = 6.5 },
+  { frame = "5", duration = 4.5 },
+  { frame = "6", duration = 1.2 },
+]

@@ -1,0 +1,22 @@
+# Taking her phone out and reading it (frame 4), and putting it away.
+scale = 0.5
+anchor = [62, 202]
+
+[actions.out]
+next = "phone.out.4"
+steps = [
+  { frame = "0", duration = 1 },
+  { frame = "1", duration = 3 },
+  { frame = "2", duration = 3 },
+  { frame = "3", duration = 2.5 },
+  { frame = "4" },
+]
+
+[actions.away]
+steps = [
+  { frame = "4", duration = 1.5 },
+  { frame = "3", duration = 2.5 },
+  { frame = "2", duration = 3 },
+  { frame = "1", duration = 3 },
+  { frame = "0", duration = 1 },
+]
