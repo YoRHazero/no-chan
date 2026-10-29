@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import { createNooChan, NooChan, NooChanDialog } from '../src'
+import { useState, type CSSProperties } from 'react'
+import { createNooChan, NooChan, NooChanButton, NooChanDialog } from '../src'
 import { existingRuntimeOf } from '../src/react/controller'
+import { peekNow } from '../src/react/peek'
 
 const nooChan = createNooChan()
 
@@ -10,6 +11,15 @@ const actions = [
   { label: '摇一摇', step: 'sway.sway' },
   { label: '睡觉', step: 'sleep.sleep' },
 ]
+
+/** Like shadcn's buttons, which sit beside hers in noobenkyo's page header. */
+const neighbour = {
+  height: 36,
+  padding: '0 16px',
+  borderRadius: 8,
+  font: '500 14px/1 system-ui, sans-serif',
+  cursor: 'pointer',
+}
 
 /** Stand-in notices for the dialog's screen. */
 const notices = [
@@ -26,13 +36,46 @@ export function App() {
   const [unit, setUnit] = useState(100)
   const [clicks, setClicks] = useState(0)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [buttonBorder, setButtonBorder] = useState(false)
 
   return (
     <main style={{ maxWidth: 720, margin: '0 auto', padding: '32px 16px', lineHeight: 1.6 }}>
       <h1 style={{ fontSize: 22, margin: '0 0 8px' }}>no-chan playground</h1>
       <p style={{ margin: '0 0 24px', color: '#555' }}>
-        拖她，松手会落下。有通知时她看手机，点她打开手机面板。睡着后动鼠标叫醒她。
+        拖她，松手会落下。有通知时她看手机，点她打开手机面板。睡着后动鼠标叫醒她。页头右边的按钮上也扒着她，点它也打开手机面板。
       </p>
+      <header
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          margin: '0 0 24px',
+          padding: '0 0 12px',
+          borderBottom: '1px solid #e4e4e7',
+          // Her button's frame is the app's to draw: here, like the outline button beside it.
+          ...({
+            '--no-chan-button-border': buttonBorder ? '1px solid #e4e4e7' : undefined,
+          } as CSSProperties),
+        }}
+      >
+        <strong>词库</strong>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button style={{ ...neighbour, border: 0, background: '#18181b', color: '#fafafa' }}>
+            导入
+          </button>
+          <button
+            style={{
+              ...neighbour,
+              border: '1px solid #e4e4e7',
+              background: '#fff',
+              boxShadow: '0 1px 2px rgb(0 0 0 / 0.05)',
+            }}
+          >
+            导出
+          </button>
+          <NooChanButton label="交给 agent" onClick={() => setDialogOpen(true)} />
+        </div>
+      </header>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
         <label>
           <input
@@ -49,6 +92,14 @@ export function App() {
             onChange={(event) => setShown(event.target.checked)}
           />{' '}
           显示
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={buttonBorder}
+            onChange={(event) => setButtonBorder(event.target.checked)}
+          />{' '}
+          按钮边框
         </label>
         <button
           onClick={(event) => nooChan.notifyRequest(event.currentTarget.getBoundingClientRect())}
@@ -75,6 +126,7 @@ export function App() {
             {action.label}
           </button>
         ))}
+        <button onClick={peekNow}>按钮里探头</button>
       </div>
       <p style={{ marginTop: 24, fontFamily: 'ui-monospace, monospace', fontSize: 14 }}>
         点击：{clicks} 次

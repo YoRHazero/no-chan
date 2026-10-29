@@ -2,7 +2,7 @@
 
 English · [中文](README.zh-CN.md)
 
-A mascot (看板娘) for React apps. She stands at the bottom of your page: pick her up and she dangles, let go and she falls, leave her alone and she yawns, sways to her music or dozes off against a wall. She reacts to what your app tells her, and while she reads her phone, a click on her opens her phone as a panel for your content.
+A mascot (看板娘) for React apps. She stands at the bottom of your page: pick her up and she dangles, let go and she falls, leave her alone and she yawns, sways to her music or dozes off against a wall. She reacts to what your app tells her, and while she reads her phone, a click on her opens her phone as a panel for your content. She also comes as a button, hanging on its bottom edge and peeking out at the user now and then.
 
 <table>
   <tr>
@@ -114,6 +114,30 @@ She first appears 80px from the right edge. Unmounted and mounted again, she com
 - A modal `<dialog>` in the middle of the window, 360 × 720 at most. In a smaller window the phone and she shrink together to fit.
 - The screen takes the page's background colour (the first one found going up from where the dialog is rendered) and inherits your text colour and font.
 - It brings its own styles through React 19's `<style precedence>`, so there is no CSS to import.
+
+### `<NooChanButton>`
+
+| Prop      | Type         | Description                                                                              |
+| --------- | ------------ | ---------------------------------------------------------------------------------------- |
+| `label`   | `string`     | Required. The button's name: screen readers read it, and the browser shows it on hover.  |
+| `onClick` | `() => void` | Required. The button was clicked. Your app opens what it stands for, such as the dialog. |
+
+```tsx
+const [open, setOpen] = useState(false)
+
+<NooChanButton label="Ask the agent" onClick={() => setOpen(true)} />
+<NooChanDialog open={open} onOpenChange={setOpen}>…</NooChanDialog>
+```
+
+- 43 × 36, as tall as a 36px toolbar button. It is a window she is behind: her hands rest on its bottom edge, and nothing below the edge shows.
+- Now and then her head comes up behind her hands to look at the user, and goes back down: at least 20 seconds apart, then at random. It comes up with a little bounce while the pointer is on the button, and dips as the button is pressed. With reduced motion, her head stays up and nothing moves.
+- The tip on hover is the browser's own `title`, so it does not reopen when the dialog gives focus back to the button.
+- It has no frame. To draw one, set these CSS variables on the button or anywhere above it:
+
+| Variable                  | Default | Description                                                                        |
+| ------------------------- | ------- | ---------------------------------------------------------------------------------- |
+| `--no-chan-button-border` | `none`  | A `border` value, such as `1px solid #e4e4e7`. The button stays 36px tall overall. |
+| `--no-chan-button-radius` | `8px`   | Its corner radius.                                                                 |
 
 ## Extending
 
@@ -240,7 +264,7 @@ pnpm build    # type check and build the playground
 pnpm format
 ```
 
-The playground has a control for every prop and controller method, and buttons that play her yawn, sway and sleep at once.
+The playground has a control for every prop and controller method, and buttons that play her yawn, sway and sleep, and her peek out of `<NooChanButton>`, at once.
 
 ## License
 

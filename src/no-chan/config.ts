@@ -1,5 +1,7 @@
 import type { CharacterOptions } from '../character/character'
 import type { RuntimeConfig } from '../runtime/runtime'
+import buttonHandsUrl from './button-hands.png'
+import buttonHeadUrl from './button-head.png'
 import paperBallUrl from './paper-ball.png'
 import peekUrl from './peek.png'
 
@@ -39,3 +41,27 @@ export const paperBallImage = { url: paperBallUrl, size: 10 }
  * is drawn at twice that size.
  */
 export const peekImage = { url: peekUrl, width: 220, edge: 183.5 }
+
+/**
+ * Her in NooChanButton, behind its bottom edge: `head` is her head and body,
+ * `hands` her hands on the edge in front of them. Both pictures are one
+ * frame, `width` × `height` CSS pixels, whose bottom is the edge, where her
+ * body is cut off; the PNGs are drawn at twice that size. `rest`, `raised`
+ * and `pressed` are how far below that her head sits: at rest only her ears
+ * and the top of her head show behind her hands; raised, her face does.
+ */
+export const buttonImage = {
+  head: buttonHeadUrl,
+  hands: buttonHandsUrl,
+  width: 37,
+  height: 34,
+  rest: 22,
+  raised: 2.5,
+  pressed: 6,
+}
+
+/**
+ * How long NooChanButton waits before she peeks out of it, in milliseconds:
+ * at least `after`, then `mean` more on average, as with her idle actions.
+ */
+export const buttonPeek = { after: 20_000, mean: 20_000 }
