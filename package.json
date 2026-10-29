@@ -1,11 +1,30 @@
 {
   "name": "no-chan",
-  "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "A sprite-animated girl for React + Vite: drag her, drop her, let her react to your app's events and show your notices on her phone.",
+  "keywords": [
+    "react",
+    "mascot",
+    "kanban-musume",
+    "anime",
+    "sprite-animation",
+    "vite",
+    "typescript"
+  ],
+  "homepage": "https://github.com/YoRHazero/no-chan#readme",
+  "bugs": "https://github.com/YoRHazero/no-chan/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YoRHazero/no-chan.git"
+  },
+  "license": "MIT",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
+  "files": [
+    "src"
+  ],
   "sideEffects": false,
   "scripts": {
     "dev": "vite",

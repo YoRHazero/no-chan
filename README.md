@@ -1,109 +1,247 @@
 # no-chan
 
-看板娘 NooChan 的 React 组件。她站在页面底边上，可以被拖动、会落下、会对 app 里发生的事做反应。
+English · [中文](README.zh-CN.md)
 
-## 用法
+A mascot (看板娘) for React apps. She stands at the bottom of your page: pick her up and she dangles, let go and she falls, leave her alone and she yawns, sways to her music or dozes off against a wall. She reacts to what your app tells her, and while she reads her phone, a click on her opens her phone as a panel for your content.
 
-```tsx
-import { createNooChan, NooChan, NooChanDialog } from 'no-chan'
+<table>
+  <tr>
+    <td align="center"><img src="docs/no-chan.png" alt="NooChan standing, yawning, swaying and reading her phone" height="222"></td>
+    <td align="center"><img src="docs/dialog.png" alt="NooChanDialog: her phone as a panel, with her peeking over its top" width="210"></td>
+  </tr>
+  <tr>
+    <td align="center"><code>&lt;NooChan&gt;</code></td>
+    <td align="center"><code>&lt;NooChanDialog&gt;</code></td>
+  </tr>
+</table>
 
-// 整个 app 一个控制器，放在模块里，哪里都能用
-export const nooChan = createNooChan()
+- [Usage](#usage)
+- [Extending](#extending)
+- [Development](#development)
+- [License](#license)
 
-// 放在 Layout 里：她拿着手机时被点，就打开她的手机面板
-const [noticesOpen, setNoticesOpen] = useState(false)
-<NooChan controller={nooChan} hasNotice={hasNotices} onClick={() => setNoticesOpen(true)} />
-<NooChanDialog open={noticesOpen} onOpenChange={setNoticesOpen}>
-  <NoticeList />
-</NooChanDialog>
+## Usage
 
-// app 里发生的事走控制器
-nooChan.notifyError() // 有操作失败了：她会为难
-nooChan.notifyRequest(button.getBoundingClientRect()) // 从按钮发出了请求：纸团飞过来砸她
+### Install
+
+no-chan needs React 19 and Vite. It is shipped as TypeScript source that uses Vite's `import.meta.glob`, so your app's Vite compiles it along with your code.
+
+```bash
+pnpm add no-chan
+# or straight from GitHub
+pnpm add github:YoRHazero/no-chan
 ```
 
-| prop         | 说明                                                        |
-| ------------ | ----------------------------------------------------------- |
-| `controller` | `createNooChan()` 的返回值                                  |
-| `bounds`     | 她活动的元素（ref），底边是地面，左右是墙；不传就是整个窗口 |
-| `timeUnit`   | 一个时间单位多少毫秒，默认 100                              |
-| `hasNotice`  | app 有没有通知；有的时候她拿出手机看                        |
-| `onClick`    | 她拿着手机时被点了一下（按下又松开，没有拖动）              |
+```ts
+// vite.config.ts
+export default defineConfig({
+  plugins: [react()],
+  // Compile no-chan with your code rather than pre-bundling it.
+  optimizeDeps: { exclude: ['no-chan'] },
+})
+```
 
-她不在页面上时，控制器收到的事直接丢掉。她离开页面再回来（组件卸载再挂载），会站在上次的地方，其余从站立重新开始。
+### Use
 
-NooChan 自己懒加载：帧图和 runtime 在单独的 chunk 里，第一次显示时才加载，所有 PNG 解码完才出现。加载出错时她只是不出现。
+```tsx
+import { useState } from 'react'
+import { createNooChan, NooChan, NooChanDialog } from 'no-chan'
 
-### 手机面板 `NooChanDialog`
+// One controller for the whole app, in a module, so any code can reach her.
+export const nooChan = createNooChan()
 
-窗口正中的模态弹窗，画成她的手机，她在手机上沿正中探头。app 的内容放在屏幕里，超出就在屏幕里滚动。
+export function Layout() {
+  const [noticesOpen, setNoticesOpen] = useState(false)
+  return (
+    <>
+      {/* your page */}
+      <NooChan
+        controller={nooChan}
+        hasNotice={notices.length > 0}
+        onClick={() => setNoticesOpen(true)}
+      />
+      <NooChanDialog open={noticesOpen} onOpenChange={setNoticesOpen}>
+        <NoticeList notices={notices} />
+      </NooChanDialog>
+    </>
+  )
+}
 
-| prop           | 说明                                                             |
-| -------------- | ---------------------------------------------------------------- |
-| `open`         | 开没开，由 app 持有                                              |
-| `onOpenChange` | 用户关上了它（点 home 条、按 Esc、点手机外面），参数总是 `false` |
-| `children`     | 屏幕里的内容                                                     |
+// Anywhere in the app, tell her what happened:
+nooChan.notifyError() // something failed: she looks troubled
+nooChan.notifyRequest(button.getBoundingClientRect()) // a request went out: a paper ball flies at her
+```
 
-- 手机最大 360×720，她宽 220px；窗口放不下时手机和她一起等比缩小。
-- 屏幕的底色取页面的背景色（从面板所在的元素往上找第一个有底色的），文字颜色、字体继承 app 的。
-- 样式由组件自己带（React 的 `<style precedence>`），不用另外引 CSS。
+What your app _is_ goes in through props; what _happens_ in it goes through the controller.
 
-## 帧图：`src/no-chan/framesets/`
+### `createNooChan()`
 
-一个文件夹是一个帧组：每帧一个 PNG（帧名就是文件名），加一个 `frameset.toml`。
+Makes the controller to pass to `<NooChan>`.
+
+| Method                | What it tells her                                                                                                                                        |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `notifyError()`       | Something the user did failed. She looks troubled.                                                                                                       |
+| `notifyRequest(from)` | The user sent a request from `from`: a `DOMRect` such as a button's, or an `{ x, y }` point in the viewport. A paper ball flies from there and hits her. |
+
+While she is not on the page, what the controller is told is dropped.
+
+### `<NooChan>`
+
+| Prop         | Type                             | Description                                                                                         |
+| ------------ | -------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `controller` | `NooChanController`              | Required. What `createNooChan()` returned.                                                          |
+| `bounds`     | `RefObject<HTMLElement \| null>` | The element she lives in: its bottom is the floor, its sides are the walls. The window if left out. |
+| `timeUnit`   | `number`                         | Milliseconds per time unit of her animations. Default `100`.                                        |
+| `hasNotice`  | `boolean`                        | Whether your app has something for the user. While it does, she reads her phone.                    |
+| `onClick`    | `() => void`                     | She was clicked, without being dragged, while reading her phone.                                    |
+
+On her own, she:
+
+- dangles from your cursor when dragged, falls when let go, and sits a moment where she lands;
+- yawns or sways to her music every so often while standing;
+- sits down against the wall to sleep when she stands near one and nobody has touched the mouse or keyboard for three minutes; any input wakes her.
+
+She first appears 80px from the right edge. Unmounted and mounted again, she comes back where she stood; everything else starts over. Her frames and runtime load in a chunk of their own the first time she is shown, and she appears once every frame has decoded. If loading fails, she just doesn't appear.
+
+### `<NooChanDialog>`
+
+| Prop           | Type                      | Description                                                                                    |
+| -------------- | ------------------------- | ---------------------------------------------------------------------------------------------- |
+| `open`         | `boolean`                 | Required. Whether it is open; your app holds this.                                             |
+| `onOpenChange` | `(open: boolean) => void` | Required. The user closed it: the home bar, Esc, or a click outside the phone. Always `false`. |
+| `children`     | `ReactNode`               | What the phone's screen shows. It scrolls inside the screen.                                   |
+
+- A modal `<dialog>` in the middle of the window, 360 × 720 at most. In a smaller window the phone and she shrink together to fit.
+- The screen takes the page's background colour (the first one found going up from where the dialog is rendered) and inherits your text colour and font.
+- It brings its own styles through React 19's `<style precedence>`, so there is no CSS to import.
+
+## Extending
+
+Everything that makes her who she is lives in `src/no-chan/`. The machinery knows nothing of her, so to change her or teach her something new, fork the repository and edit that folder.
+
+```
+src/
+  character/   Character: reads her framesets, knows which step she is on
+  runtime/     the clock, commands, motion, her place on the page, the paper ball
+  react/       the components and the controller; the only code that touches the DOM
+  no-chan/     her: framesets, commands, settings and pictures
+```
+
+Some words used below:
+
+- **Frame**: one PNG.
+- **Frameset**: a folder of frames and a `frameset.toml` that says how to play them.
+- **Action**: a named run of steps in a frameset, written `frameset.action`.
+- **Step**: one frame held for a while, written `frameset.action.step` (counting from 0; `frameset.action` is its step 0).
+
+### Character
+
+The character holds her framesets and which step she is on, and nothing else. It takes every frameset at once when it is made, so that every `next` can be checked, and throws if any frameset is wrong; after that its data is read-only.
+
+It is passive: it does not know the time and never acts on its own. Only the runtime calls `switchTo(step)`, because the runtime keeps how long she has been on a step. Everyone else only reads: a step's frame, duration, priority and motion, and `following(step)`, the step after it.
+
+When a step's time is up, she moves on to `following(step)`: the next step of the action; after the last one, the action's `next`; without that, the character's default (standing, for her); without a default, she holds the last step.
+
+### Command
+
+Every other switch is a command: getting picked up, falling, landing, looking troubled, taking out her phone, dozing off. Her commands are in `src/no-chan/commands.ts`.
+
+| Field      | Description                                                                          |
+| ---------- | ------------------------------------------------------------------------------------ |
+| `name`     | Its name.                                                                            |
+| `target`   | The step to switch to. With a list, one is picked at random.                         |
+| `priority` | It moves her only off a step of lower priority.                                      |
+| `rule`     | `(now) => boolean`: whether it should happen, from what happened and how she is now. |
+
+Every animation frame, the runtime:
+
+1. makes every command whose `rule` holds _ready_. A ready command stays ready until it is carried out;
+2. picks the ready command with the highest priority; among equals, the one ready longest, then the one listed first;
+3. if its priority is not higher than the current step's, leaves it ready for later: this is how reactions queue;
+4. otherwise clears it and switches her to its target, unless she is already in that action.
+
+She switches at most once a frame, by a command or by time.
+
+A `rule` reads `now`:
+
+| Field                  | Description                                                                                                        |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `inAction(action)`     | Whether she is on a step of `action` (`frameset.action`).                                                          |
+| `onStep(step)`         | Whether she is on `step` (`frameset.action.step`).                                                                 |
+| `elapsed`              | Milliseconds on the current step.                                                                                  |
+| `sinceInput`           | Milliseconds since the mouse or keyboard was last used.                                                            |
+| `happened(event)`      | Whether `event` happened since the last frame: `'input'`, `'hit'` (the paper ball) or `'error'` (`notifyError()`). |
+| `ready(name)`          | Whether the command `name` is ready.                                                                               |
+| `pressing`, `dragging` | Whether she is pressed on; whether she is being dragged.                                                           |
+| `onFloor`, `nearWall`  | Whether her feet are on the floor; whether she is within a body's width of a wall.                                 |
+| `hasNotice`            | The `hasNotice` prop.                                                                                              |
+| `chance(perSecond)`    | True this frame with a chance of `perSecond` a second.                                                             |
+
+For example, her idle command:
+
+```ts
+{
+  name: 'idle',
+  target: ['yawn.yawn', 'sway.sway'],
+  priority: 1,
+  // At least 20 seconds standing, then about 20 more on average.
+  rule: (now) => now.inAction('standing.standing') && now.elapsed >= 20_000 && now.chance(1 / 20),
+}
+```
+
+Her priorities follow this convention:
+
+| Priority | On a step, it means                                                    | Her commands at this priority                              |
+| -------- | ---------------------------------------------------------------------- | ---------------------------------------------------------- |
+| 0        | Anything can interrupt: standing, yawning, swaying, the phone          |                                                            |
+| 1        | Only waking and hands interrupt: troubled, hit, landing, sleep, waking | troubled, hit, take out phone, put away phone, idle, sleep |
+| 2        | Only hands interrupt: dangling, falling                                | wake                                                       |
+| 3        |                                                                        | pick up, let go, land                                      |
+
+### `frameset.toml`
+
+Each folder in `src/no-chan/framesets/` is a frameset: one PNG per frame, named after the frame, and a `frameset.toml`.
 
 ```toml
-scale = 0.5                # 一个图片像素画成几个 CSS 像素
-anchor = [20, 10]          # 对齐点：组内换帧时对齐的点
-between_feet = [53, 212]   # 两脚中点：她在图里站在哪；不写就等于对齐点
+scale = 0.5                # CSS pixels per image pixel
+anchor = [20, 10]          # the point frames line up on within this frameset
+between_feet = [53, 212]   # where she stands in the picture; the anchor if left out
 
-[frames]                   # 可选：只写和上面不一样的帧
+[frames]                   # optional: only frames that differ from the above
 2 = { anchor = [21, 10], resolution = 2 }
 
 [actions.held]
-priority = 2               # 可选：本动作的 step 默认优先级
-duration = 2               # 可选：本动作的 step 默认时长
-motion = "follow"          # 可选：移动方式，不写是 floor
-next = "dragged.held"      # 可选：播完去哪；不写就回到站立
+priority = 2               # optional: default priority of its steps (else 0)
+duration = 2               # optional: default duration of its steps (else 1)
+motion = "follow"          # optional: how she moves; "floor" if left out
+next = "dragged.held"      # optional: where to go after the last step
 steps = [{ frame = "0" }, { frame = "1", duration = 3 }]
 ```
 
-- 点都是整数像素，从 PNG 左上角量起。
-- **对齐点**只在同一个帧组里换帧时用：标这组动画里不动的部位（站着的是脚，被拎着的是手，睡觉的是靠墙那一侧）。换到别的帧组时，让两脚中点重合，她原地换图。
-- **两脚中点**：x 是两只鞋的正中间，y 是紧挨鞋底下面那一行。不是站姿的帧，取这组开始或结束时站姿的两脚中点。
-- step 的时长是正数，单位是时间单位，没写取 action 的，再没有是 1；优先级是整数，没写取 action 的，再没有是 0。
-- `next` 是 `frameset.action` 或 `frameset.action.step`。要循环或停住的动作自己写：指向自己的第 0 步是循环，指向自己的最后一步是停住。
-- 移动方式：`floor` 贴地（默认）、`follow` 手跟着鼠标、`fall` 下落、`wall` 靠墙。
-- 不认识的键、没被任何 step 用到的 PNG 都会报错。`pnpm test` 会把所有帧组读一遍。
+- Points are whole pixels from the top left of the PNG.
+- The **anchor** is the part of her that stays still within the frameset: her feet when standing, her hand when dangling, the side against the wall when sleeping. Frames of one frameset are lined up on it.
+- **`between_feet`**: x is midway between her shoes, y is the row just below their soles. When she switches to another frameset, the two frames are lined up on it, so she changes picture where she stands. In a frame where she isn't standing, use where she stands at the start or end of the frameset.
+- **`resolution`** draws a frame at that many times the frameset's resolution: a frame with `resolution = 2` has twice the pixels for the same size on the page.
+- A step's `duration` is a positive number of time units; its `priority` is an integer.
+- `next` is `frameset.action` or `frameset.action.step`. An action that loops or holds says so: pointing at its own step 0 loops, at its own last step holds.
+- `motion` is one of `floor` (stays on the floor; the default), `follow` (her anchor follows the pointer), `fall` (falls) and `wall` (shuffles up against the nearer wall, mirrored against the right one).
+- Frameset and action names have no dots. An unknown key, a missing frame or a PNG no step uses is an error, and `pnpm test` reads every frameset.
 
-## 指令：`src/no-chan/commands.ts`
+To teach her a new action: add a folder of PNGs with its `frameset.toml`, add a command to `src/no-chan/commands.ts` that targets it, and try it in the playground.
 
-除了动作按 `next` 往下播，她的每一次切换都是一个指令：名字、目标、优先级、`rule`。runtime 每帧检查每个指令的 `rule`，成立了指令就「就绪」并一直保持；就绪的指令里优先级最高的那个，比当前 step 的优先级高就切过去，否则继续等。目标和当前是同一个动作时，指令清掉不切。
-
-| 值  | 步上的意思                                         | 指令                                   |
-| --- | -------------------------------------------------- | -------------------------------------- |
-| 0   | 什么都能打断：站立、打哈欠、摇一摇、掏手机、收手机 |                                        |
-| 1   | 只有叫醒和手能打断：为难、被砸、落地、睡觉、醒来   | 为难、被砸、掏手机、收手机、待机、去睡 |
-| 2   | 只有手能打断：被拎着、下落                         | 醒来                                   |
-| 3   |                                                    | 拎起、松手、落地                       |
-
-## 目录
-
-- `src/character/`：角色。读帧组、记当前在哪一步、`switchTo`；不知道时间，从不自己行动。
-- `src/runtime/`：runtime。时钟、指令、移动方式、位置、纸团；不碰 React 和 DOM。
-- `src/react/`：组件、控制器，以及唯一碰 DOM 的 `stage.tsx`。
-- `src/no-chan/`：她自己的内容：帧组、指令表、参数、纸团的图、手机面板上探头的图。
-- `tests/`：测试。
-- `playground/`：调试页面。
-
-## 开发
+## Development
 
 ```bash
-pnpm dev       # playground：http://localhost:5173
+pnpm install
+pnpm dev      # the playground, at http://localhost:5173
 pnpm test
 pnpm lint
-pnpm build     # tsc -b 加 playground 的构建
+pnpm build    # type check and build the playground
 pnpm format
 ```
 
-库以源码的形式被引用（`exports` 指向 `src/index.ts`），所以 `tsconfig.app.json` 和 noobenkyo 一样严格，库里只用相对路径。
+The playground has a control for every prop and controller method, and buttons that play her yawn, sway and sleep at once.
+
+## License
+
+[MIT](LICENSE)
