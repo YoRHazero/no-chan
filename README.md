@@ -5,13 +5,17 @@
 ## 用法
 
 ```tsx
-import { createNooChan, NooChan } from 'no-chan'
+import { createNooChan, NooChan, NooChanDialog } from 'no-chan'
 
 // 整个 app 一个控制器，放在模块里，哪里都能用
 export const nooChan = createNooChan()
 
-// 放在 Layout 里
-<NooChan controller={nooChan} hasNotice={inboxHasItems} onClick={openInbox} />
+// 放在 Layout 里：她拿着手机时被点，就打开她的手机面板
+const [noticesOpen, setNoticesOpen] = useState(false)
+<NooChan controller={nooChan} hasNotice={hasNotices} onClick={() => setNoticesOpen(true)} />
+<NooChanDialog open={noticesOpen} onOpenChange={setNoticesOpen}>
+  <NoticeList />
+</NooChanDialog>
 
 // app 里发生的事走控制器
 nooChan.notifyError() // 有操作失败了：她会为难
@@ -29,6 +33,20 @@ nooChan.notifyRequest(button.getBoundingClientRect()) // 从按钮发出了请�
 她不在页面上时，控制器收到的事直接丢掉。她离开页面再回来（组件卸载再挂载），会站在上次的地方，其余从站立重新开始。
 
 NooChan 自己懒加载：帧图和 runtime 在单独的 chunk 里，第一次显示时才加载，所有 PNG 解码完才出现。加载出错时她只是不出现。
+
+### 手机面板 `NooChanDialog`
+
+窗口正中的模态弹窗，画成她的手机，她在手机上沿正中探头。app 的内容放在屏幕里，超出就在屏幕里滚动。
+
+| prop           | 说明                                                             |
+| -------------- | ---------------------------------------------------------------- |
+| `open`         | 开没开，由 app 持有                                              |
+| `onOpenChange` | 用户关上了它（点 home 条、按 Esc、点手机外面），参数总是 `false` |
+| `children`     | 屏幕里的内容                                                     |
+
+- 手机最大 360×720，她宽 220px；窗口放不下时手机和她一起等比缩小。
+- 屏幕的底色取页面的背景色（从面板所在的元素往上找第一个有底色的），文字颜色、字体继承 app 的。
+- 样式由组件自己带（React 的 `<style precedence>`），不用另外引 CSS。
 
 ## 帧图：`src/no-chan/framesets/`
 
@@ -74,7 +92,7 @@ steps = [{ frame = "0" }, { frame = "1", duration = 3 }]
 - `src/character/`：角色。读帧组、记当前在哪一步、`switchTo`；不知道时间，从不自己行动。
 - `src/runtime/`：runtime。时钟、指令、移动方式、位置、纸团；不碰 React 和 DOM。
 - `src/react/`：组件、控制器，以及唯一碰 DOM 的 `stage.tsx`。
-- `src/no-chan/`：她自己的内容：帧组、指令表、参数、纸团的图。
+- `src/no-chan/`：她自己的内容：帧组、指令表、参数、纸团的图、手机面板上探头的图。
 - `tests/`：测试。
 - `playground/`：调试页面。
 

@@ -1,6 +1,7 @@
 import type { CharacterOptions } from '../character/character'
 import type { RuntimeConfig } from '../runtime/runtime'
 import paperBallUrl from './paper-ball.png'
+import peekUrl from './peek.png'
 
 const standing = 'standing.standing'
 
@@ -30,3 +31,11 @@ export const runtimeConfig: RuntimeConfig = {
 
 /** The paper ball's picture and its size on the page, in CSS pixels. */
 export const paperBallImage = { url: paperBallUrl, size: 10 }
+
+/**
+ * Her peeking over the top of NooChanDialog's phone, which is 360 CSS pixels
+ * wide at full size. `width` is hers on that phone; `edge` is how far down
+ * the picture the phone's top edge runs, where her body is cut off. The PNG
+ * is drawn at twice that size.
+ */
+export const peekImage = { url: peekUrl, width: 220, edge: 183.5 }
