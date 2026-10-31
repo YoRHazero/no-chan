@@ -4,6 +4,8 @@ English · [中文](README.zh-CN.md)
 
 A mascot (看板娘) for React apps. She stands at the bottom of your page: pick her up and she dangles, let go and she falls, leave her alone and she yawns, sways to her music or dozes off against a wall. She reacts to what your app tells her, and while she reads her phone, a click on her opens her phone as a panel for your content. She also comes as a button, hanging on its bottom edge and peeking out at the user now and then.
 
+**[Try her in the live demo →](https://yorhazero.github.io/no-chan/)**
+
 <table>
   <tr>
     <td align="center"><img src="docs/no-chan.png" alt="NooChan standing, yawning, swaying and reading her phone" height="222"></td>

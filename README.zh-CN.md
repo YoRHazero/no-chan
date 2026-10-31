@@ -4,6 +4,8 @@
 
 React app 的看板娘。她站在页面底边上：拎起来她会晃，松手她会掉下来，放着不管她会打哈欠、跟着音乐摇、靠着墙睡着。她会对 app 告诉她的事做反应；她看手机的时候点她一下，会打开她的手机，里面放你的内容。她还可以是一个按钮：扒在按钮的底边上，时不时探头看一眼用户。
 
+**[在线试玩 →](https://yorhazero.github.io/no-chan/)**
+
 <table>
   <tr>
     <td align="center"><img src="docs/no-chan.png" alt="NooChan 站着、打哈欠、摇一摇、看手机" height="222"></td>
